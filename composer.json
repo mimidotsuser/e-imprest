@@ -1,12 +1,12 @@
 {
-  "name": "mimidots/ezzy",
-  "description": "full mimidots website",
+  "name": "mimidots/e-mprest",
+  "description": "Web based Imprest management system for higher education institution",
   "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
     {
-      "name": "Martin Murage",
-      "email": "hello@mimidots.com"
+      "name": "Murage",
+      "email": "holla@mimidots.com"
     }
   ],
   "require": {
