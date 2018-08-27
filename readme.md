@@ -13,7 +13,7 @@ Imprest management involves:
 #### Setup
 - Clone or download the project as a zip into your web server <br/>
 - Run `composer install` to install all the project dependencies.
-- Import the mysql database provided [here](REEBACK%20DATABASE%20EXPORT.sql'). <br/>
+- Import the mysql database provided [here](REEBACK%20DATABASE%20EXPORT.sql). <br/>
 - Rename `.env.example` file to `.env` . Do not forget to provide your valid configuration. More documentation on this can be found [here](https://github.com/vlucas/phpdotenv)
 
 #### To setup a local mirror of the website:
