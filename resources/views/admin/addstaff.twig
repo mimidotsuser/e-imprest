@@ -1,0 +1,182 @@
+{% extends "partials/admin.twig" %}
+
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <li class="">staff</li>
+    <li class="active">add</li>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="card">
+  <div class="card-body">
+
+      <div class="row">
+
+          <form action="/admin/add_staff" method="post" class="col-md-12" enctype="multipart/form-data" >
+
+          {#left side#}
+          <div class="col-md-6">
+
+              <div class="form-group">
+                  <label for="fname">First name</label>
+                  <input type="text"
+                         class="form-control" name="fname" id="fname"
+                         aria-describedby="firstname" placeholder="" required>
+              </div>
+
+
+              <div class="form-group">
+                  <label for="lname">Last name</label>
+                  <input type="text"
+                         class="form-control" name="lname" id="lname"
+                         aria-describedby="last name" placeholder="" required>
+              </div>
+              <div class="form-group">
+                  <label for="sname">Surname</label>
+                  <input type="text"
+                         class="form-control" name="sname" id="sname"
+                         aria-describedby="surname" placeholder="" required>
+              </div>
+
+              <div class="form-group">
+                  <label for="staffno">Staff File Number</label>
+                  <input type="text"
+                         class="form-control" name="staffno" id="staffno"
+                         maxlength="5" minlength="5" min="100" value="" required>
+              </div>
+
+              <div class="form-group">
+                  <label for="mobile">Mobile</label>
+                  <input type="text"
+                         class="form-control" name="mobile" id="mobile" minlength="13" maxlength="13" value="+2547" placeholder="">
+              </div>
+          </div>
+
+
+          {#right side#}
+          <div class="col-md-6">
+
+              <input type="hidden" name="dept" disabled id="bckupPlan">
+
+              <div class="form-group">
+                  <label for="role">Staff Role</label>
+                  <select class="form-control" name="role" id="role" required>
+
+                      {% if userrole and userrole.status=='success' and userrole.code=='200' %}
+
+                          {% for role in userrole.response %}
+                              <option value="{{ role.id }}">{{ role.name|upper }}</option>
+                          {% endfor %}
+
+                      {% endif %}
+                  </select>
+              </div>
+
+              <div class="form-group">
+                  <label for="dept">Department</label>
+                  <select class="form-control" name="dept" id="dept" required>
+                      {% if depts and depts.status=='success' and depts.code=='200' %}
+                          {% for department in depts.response %}
+                              <option value="{{ department.id }}">{{ department.name|upper }}</option>
+                          {% endfor %}
+
+                      {% endif %}
+                  </select>
+              </div>
+
+
+              <div class="form-group">
+                  <label for="status">Account Status</label>
+                  <select class="form-control" name="status" id="status">
+                      <option value="1">Active</option>
+                      <option value="2">Suspended</option>
+                      <option value="0">Inactive</option>
+                  </select>
+              </div>
+
+              <div class="form-group">
+                  <label for="sign">Upload signature</label>
+                  <input type="file" class="form-control-file"  name="sign" id="sign" required>
+              </div>
+
+          </div>
+              <div class="p-5 float-right">
+                  <button type="reset" class="btn btn-info ">Reset</button>
+                  <button type="submit" class="btn btn-success ">Submit</button>
+              </div>
+
+          </form>
+
+
+      </div>
+
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+
+    <script>
+
+        $(function () {
+
+            $('#role').change(function () {
+
+                var rex = new RegExp('ACCOUNT', 'i');
+
+                var obj= $('#dept');
+
+                if(rex.test($(this).find(':selected').text())){
+                    obj.val(7).attr('disabled',true);
+
+                    $('#bckupPlan').val(obj.val()).removeAttr('disabled');
+
+                }else {
+                    $('#dept').val(1).removeAttr('disabled');
+                    $('#bckupPlan').attr('disabled',true);
+                }
+            });
+
+            valPhone();
+            valStaffNo();
+        });
+
+        function valStaffNo() {
+            $('#staffno').on('keyup keyenter keypress',function (e) {
+
+                $(this).removeClass('invalid');
+
+                if(isNaN (parseInt(e.key)) ||e.keyCode==69){
+                    $(this).addClass('invalid');
+                    e.preventDefault();
+                }
+            });
+
+            }
+        
+        function valPhone() {
+            $('#mobile').on('keyup keyenter keypress',function (e) {
+
+                $(this).removeClass('invalid');
+
+                var c=$(this).val();
+                if(c.substr(0,5)!='+2547'){
+                    $(this).val('+2547');
+                }
+                if(e.keyCode>57 || e.keyCode<48){
+                    $(this).addClass('invalid');
+                    e.preventDefault();
+                }
+
+            })
+        }
+
+    </script>
+{% endblock %}
+

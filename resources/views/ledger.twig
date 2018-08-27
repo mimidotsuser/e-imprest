@@ -1,0 +1,85 @@
+{% extends "partials/staff.twig" %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+
+    <li class="">Finance</li>
+    <li class="">General Ledger</li>
+{% endblock %}
+
+{% block content %}
+
+
+    {#only HOD finance department should have access to this#}
+    {% if user and user.response[0]['departmentId']==7 and  user.response[0]['roleId']==2 %}
+        <div class="card">
+            <div class="card-header">
+
+
+                <span class="text-center">General Ledger Report Overview</span>
+
+                {% if fin and fin.code==200 %}
+                    <div class="btn-group float-right mr-5" role="group">
+                        <button class="btn  btn-info dropdown-toggle" type="button" id="printGrup"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false">
+                            Print <i class="fa fa-print"></i>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="printGrup" x-placement="bottom-start"
+                             style="position: absolute; transform: translate3d(0px, 35px, 0px);
+                      top: 0px; left: 0px; will-change: transform;">
+                            {% for yr in fin.response %}
+                                <a class="dropdown-item" href="/staff/imprest/reports/ledger?id={{ yr.financialYear }}">Year {{ yr.financialYear }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Financial Year</th>
+                            <th>Account</th>
+                            <th>Budget Allocation</th>
+                            <th>Running balance</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if data and data.status=='success' and data.code==200 %}
+
+                            {% for dee in data.response %}
+                                <tr>
+                                    <td>{{ dee.financialYear }}</td>
+                                    <td>{{ dee.accntname }}</td>
+                                    <td>{{ dee.amount }}</td>
+                                    <td>{{ dee.runningBal }}</td>
+                           </tr>
+                            {% endfor %}
+
+                        {% endif %}
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+
+        <div class="card">
+            <div class="card-body">
+
+                {% include 'partials/403.twig' %}
+            </div>
+        </div>
+
+    {% endif %}
+
+
+
+{% endblock %}
+

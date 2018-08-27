@@ -1,0 +1,142 @@
+{% from 'partials/macros.twig' import  feeback as alert%}
+
+{% extends "partials/skeleton.twig" %}
+
+{% block styles %}
+    {{ parent() }}
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/public/css/app.css">
+{% endblock %}
+
+
+{% block holder %}
+
+    {#main navigation#}
+    {% block navigation %}
+        <aside id="left-panel" class="left-panel">
+            <nav class="navbar navbar-expand-sm navbar-default">
+
+                <div class="navbar-header">
+                    <a class="float-left"><img class="logo2" src="/public/images/logo.png" alt="Logo"></a>
+
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-menu"
+                            aria-controls="main-menu" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <a class="navbar-brand"><img class="logo" src="/public/images/logo.png" alt="Logo"></a>
+                </div>
+
+                <div id="main-menu" class="main-menu collapse navbar-collapse pt-3">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a href="/admin"> <i class="menu-icon fa fa-dashboard"></i>Dashboard </a>
+                        </li>
+
+                        <li class="menu-item-has-children dropdown">
+                            <a href="#" class="dropdown-toggle"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="menu-icon fa fa-users"></i>Staff</a>
+                            <ul class="sub-menu children dropdown-menu">
+                                <li><i class="menu-icon fa fa-th"></i><a href="/admin/add_staff">Register Staff</a></li>
+                                <li><i class="menu-icon fa fa-th"></i><a href="/admin/view_all">View All</a></li>
+                                {#<li><i class="menu-icon fa fa-th"></i><a href="/admin/reports">Reports</a></li>#}
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="/admin/add_department"> <i class="menu-icon fa fa-dashcube"></i>Departments </a>
+                        </li>
+
+
+
+                        <h3 class="menu-title">Settings</h3>
+                        <li class="menu-item">
+                            <a href="/admin/account"> <i class="menu-icon fa fa-gear"></i>Account</a>
+
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+    {% endblock %}
+
+
+    <div id="right-panel" class="right-panel">
+
+        {% block navtop %}
+            <header id="header" class="header">
+
+                <div class="header-menu">
+                    <div class="col-sm-8">
+                        <a id="menuToggle" class="menutoggle pull-left"><i class="fa fa fa-tasks"></i></a>
+
+                        <div class="header-left">
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-4 ">
+                        <div>
+                            <div class="dropdown float-right">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown"
+                                   aria-haspopup="true" aria-expanded="false">admin</a>
+
+                                <div class="dropdown-menu">
+                                    <a class="nav-link" href="">Account Settings</a>
+                                    <div class=""></div>
+                                    <a class="nav-link" href="/login">Logout</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </header>
+        {% endblock %}
+
+        <div class="breadcrumbs">
+            <div class="col-sm-12">
+                <div class="page-header float-left">
+                    <div class="page-title">
+                        <ol class="breadcrumb text-right">
+                            {% block breadcrumb %}
+                                <li><a href="/admin">Dashboard</a></li>
+                            {% endblock %}
+
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="content mt-3 ">
+            <div class="animated fadeIn">
+
+                {% block feedback %}
+
+                    {{ alert(notify) }}
+                {% endblock %}
+
+
+                {% block content %}
+
+                {% endblock %}
+            </div>
+        </div>
+
+
+    </div>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+    {{ parent() }}
+    <script src="/public/js/app.js"></script>
+
+{% endblock %}
+
+

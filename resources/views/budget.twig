@@ -1,0 +1,181 @@
+{% extends "partials/staff.twig" %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <li class="">Finance</li>
+    <li class="active">Budget</li>
+{% endblock %}
+
+{% block content %}
+
+ {#only HOD finance department should have access to this#}
+    {% if user and user.response[0]['departmentId']==7 and  user.response[0]['roleId']==2 %}
+
+    <div class="card">
+        <div class="card-header">
+
+            <button class="btn float-left btn-success" data-toggle="modal" data-target="#budgetAdd"><i class="fa fa-plus"></i> Add Entry</button>
+
+            {% if fin and fin.code==200 %}
+
+
+            <div class="btn-group float-right mr-5" role="group">
+                <button class="btn  btn-info dropdown-toggle" type="button" id="printGrup"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false">
+                    Print <i class="fa fa-print"></i>
+                </button>
+                <div class="dropdown-menu" aria-labelledby="printGrup" x-placement="bottom-start"
+                     style="position: absolute; transform: translate3d(0px, 35px, 0px);
+                      top: 0px; left: 0px; will-change: transform;">
+                    {% for yr in fin.response %}
+                        <a class="dropdown-item" href="/staff/imprest/reports/budget?id={{ yr.financialYear }}">Year {{ yr.financialYear }}</a>
+                    {% endfor %}
+                       </div>
+            </div>
+            {% endif %}
+
+        </div>
+      <div class="card-body">
+
+          <div class="table-responsive">
+              <table class="table table-hover">
+                  <thead>
+                  <tr>
+                      <th>Entry Id</th>
+                      <th>Financial Year</th>
+                      <th>Department</th>
+                      <th>Amount</th>
+                      <th>Account</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+
+                  {% if budget and budget.status=='success' and budget.code==200 %}
+
+                      {% for entry in budget.response %}
+                          <tr>
+                              <td>{{ entry.budgetCode }}</td>
+                              <td>{{ entry.financialYear }}</td>
+                              <td>{{ entry.name }}</td>
+                              <td>{{ entry.amount }}</td>
+                              <td>{{ entry.account }}</td>
+                          </tr>
+                      {% endfor %}
+                  {% endif %}
+
+                  </tbody>
+              </table>
+          </div>
+
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="budgetAdd" tabindex="-1" role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h5 class="" id="">Add New Budget Entry</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="card">
+                        <div class="card-body">
+                            <form action="/staff/budget/?action=add" method="post">
+                                {#left side#}
+                                <div class="col-md-6">
+
+                                    <div class="form-group">
+                                        <label for="finYear">Financial Year</label>
+                                        <select class="form-control" name="finYear" id="finYear" required>
+                                            {% if fin and fin.status=='success' and fin.code==200 %}
+
+                                                {% for yr in fin.response %}
+                                                    <option value="{{ yr.financialYear }}">{{ yr.financialYear }}</option>
+                                                {% endfor %}
+
+                                            {% endif %}
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="dept">Department</label>
+                                        <select class="form-control" name="dept" id="dept" required>
+                                            {% if dept  and dept.status=='success' and dept.code==200%}
+                                                {% for department in dept.response %}
+                                                    <option value="{{ department.id }}">{{ department.name }}</option>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </select>
+                                    </div>
+
+                                </div>
+
+                                {#right sysd#}
+                                <div class="col-md-6">
+
+                                    <div class="form-group">
+                                        <label for="amount">Amount</label>
+                                        <input type="number"
+                                               class="form-control" name="amount" min="0" id="amount" required >
+                                    </div>
+
+
+                                    <input type="hidden" name="accnt_name" value="Imprest Funds" id="accnt_name">
+                                    <div class="form-group">
+                                        <label for="accnt">Account</label>
+                                        <select class="form-control" name="accnt" id="accnt" required>
+                                            <option value="5000">Imprest Funds</option>
+                                            <option value="1100">Cash Account</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="float-right">
+                                    <button type="reset" class="btn btn-danger">reset</button>
+                                    <button type="submit" class="btn btn-success">submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+
+        <div class="card">
+            <div class="card-body">
+
+                {% include 'partials/403.twig' %}
+            </div>
+        </div>
+
+    {% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+
+    <script>
+
+       $(function () {
+
+           $('#accnt').change(function () {
+               $('#accnt_name').val($(this).text())
+           })
+
+       })
+    </script>
+{% endblock %}

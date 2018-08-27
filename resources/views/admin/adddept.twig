@@ -1,0 +1,186 @@
+{% extends "partials/admin.twig" %}
+
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <li class="">department</li>
+    <li class="active">Manage</li>
+{% endblock %}
+
+
+{% block content %}
+
+
+    <div class="card">
+        <div class="card-header">
+
+            <button class="btn btn-sm float-left btn-success" data-toggle="modal" data-target="#addPt">Add</button>
+        </div>
+      <div class="card-body">
+
+          <div class="table-responsive">
+              <table class="table">
+                  <thead>
+                  <tr>
+                      <th>Id</th>
+                      <th>Department Name</th>
+                      {#<th>Parent Department</th>#}
+                      <th>Action</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {% if data and data.status=='success' and data.code=='200' %}
+
+                      {% for department in data.response %}
+                          <tr>
+                              <td>{{ loop.index }}</td>
+                              <td>{{ department.name }}</td>
+                              {#<td>{{ department.parent }}</td>#}
+                              <td>
+                                  <div>
+                                      <button class="btn btn-sm btn-info btn-edit" data-id="{{ department.id }}">Edit</button>
+                                  </div>
+                              </td>
+                          </tr>
+                      {% endfor %}
+
+                  {% endif %}
+
+
+                  </tbody>
+              </table>
+          </div>
+
+      </div>
+    </div>
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="addPt" tabindex="-1" role="dialog" aria-labelledby="Add department" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header ">
+                    <h4 class="modal-title pl-4" id="Add department">Add New Department</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="card p-5">
+                         <form method="post" action="/admin/add_department">
+                             <div class="form-group">
+                                 <label for="parent">Parent Department</label>
+                                 <select class="form-control" name="parent" id="parent" required>
+                                     <option value="0" >none</option>
+                                     {% if data and data.status=='success' and data.code=='200' %}
+
+                                         {% for department in data.response %}
+                                             <option value="{{ department.id }}" selected>{{ department.name|upper }}</option>
+                                         {% endfor %}
+
+                                     {% endif %}
+                                 </select>
+                             </div>
+
+                             <div class="form-group">
+                                    <label for="dept">Department Name </label>
+                                    <input type="text"
+                                           name="dept" id="dept" class="form-control" placeholder=""
+                                           aria-describedby="department name" required>
+                                </div>
+
+
+                                <div class="float-right">
+                                    <button type="button" class="btn btn-info btn-sm"  data-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-success btn-sm">Submit</button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- update Modal -->
+    <div class="modal fade" id="editDepat" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modelTitleId">Update  Department Details</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <form action="/admin/update_department" method="post">
+                        <input type="hidden" name="id" id="id">
+                        
+                        <div class="form-group">
+                            <label for="parent1">Parent Department</label>
+                            <select class="form-control" name="parent" id="parent1" required>
+                                <option value="0" >none</option>
+                                {% if data and data.status=='success' and data.code=='200' %}
+
+                                    {% for department in data.response %}
+                                        <option value="{{ department.id }}" selected>{{ department.name|upper }}</option>
+                                    {% endfor %}
+
+                                {% endif %}
+                            </select>
+                        </div>
+
+                        <div class="form-group pb-2">
+                            <label for="dept1">Department Name</label>
+                            <input type="text"
+                                   class="form-control" name="dept" id="dept1"  placeholder="">
+                        </div>
+
+                        <div class="float-right">
+                            <button type="submit" class="btn btn-primary btn-sm">update</button>
+                            <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+
+    <script>
+        $(function () {
+
+            $('.btn-edit').click(function () {
+
+                //fetch department details, then update
+                $.post('/admin/department/data',
+                    {id:$(this).attr('data-id')},
+                    function (data) {
+                    try{
+                        data=JSON.parse(data)['response'][0];
+
+                        $('#dept1').val(data.name)
+                        $('#parent1').val(data.parentDepartment)
+                        $('#id').val(data.departmentId)
+                        $('#editDepat').modal()
+                    }catch (e){
+
+                    }
+                })
+
+            });
+
+        })
+    </script>
+{% endblock %}

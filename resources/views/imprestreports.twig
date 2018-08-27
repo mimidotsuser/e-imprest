@@ -1,0 +1,144 @@
+{% extends "partials/staff.twig" %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <li class="">Imprest</li>
+    <li class="active">Reports</li>
+{% endblock %}
+
+{% block content %}
+
+    <ul class="nav nav-tabs nav-stacked">
+        <li class="nav-item active">
+            <a href="#warrantRequests" class="nav-link active" data-toggle="tab">Warrant Applications</a>
+        </li>
+        <li class="nav-item">
+            <a href="#surrenders" class="nav-link" data-toggle="tab">Surrender Applications</a>
+        </li>
+
+        {#only HOD and accountant claimant and accountant examiner should have access to this#}
+        {% if user and
+        (user.response[0]['roleId']==2 or user.response[0]['roleId']==3 or user.response[0]['roleId']==4) %}
+
+        <li class="nav-item">
+            <a href="#reports" class="nav-link" data-toggle="tab">Departmental Report</a>
+        </li>
+        {% endif %}
+
+
+
+    </ul>
+
+    <div class="tab-content pt-0">
+        <div class="tab-pane active" id="warrantRequests" >
+            <div class="card">
+              <div class="card-body">
+
+                  {% if mywarrants and mywarrants.code==200 %}
+
+                  <div class="table-responsive">
+                      <table class="table table-hover table-bordered">
+                          <thead>
+                          <tr>
+                              <th>ID</th>
+                              <th>Date Applied</th>
+                              <th>Amount applied</th>
+                              <th>Action</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          {% for req in mywarrants.response %}
+                              <tr>
+                                  <td>{{ req.ImprestId }}</td>
+                                  <td>{{ req.dateRequested|date('d-m-Y') }}</td>
+                                  <td>{{ req.initAmount }}</td>
+                                  <td>
+                                      <form action="/staff/imprest/reports/timeline?id=1" method="post">
+                                          <input type="text" name="id" value="{{ req.ImprestId }}" hidden>
+                                      <button type="submit" class="btn-sm btn btn-info">view progress Track</button>
+                                      </form>
+                                  </td>
+                              </tr>
+
+                          {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+                  {% else %}
+
+                      <div class="text-center">No data currently available</div>
+                  {% endif %}
+
+              </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="surrenders">
+            
+            <div class="card">
+              <div class="card-body">
+
+
+                  {% if mysurrenders and mysurrenders.code==200 %}
+
+                      <div class="table-responsive">
+                          <table class="table table-hover table-bordered">
+                              <thead>
+                              <tr>
+                                  <th>Reference ID</th>
+                                  <th>Date Applied</th>
+                                  <th>Amount Assigned</th>
+                                  <th>Action</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              {% for req in mysurrenders.response %}
+                                  <tr>
+                                      <td>{{ req.imprestId }}</td>
+                                      <td>{{ req.dateRequested|date('d-m-Y') }}</td>
+                                      <td>{{ req.amountAssigned }}</td>
+                                      <td>
+                                          <form action="/staff/imprest/reports/timeline?id=2" method="post">
+                                              <input type="text" name="id" value="{{ req.refId }}" hidden>
+                                              <button type="submit" class="btn-sm btn btn-info">view progress Track</button>
+                                          </form>
+                                      </td>
+                                  </tr>
+
+                              {% endfor %}
+                              </tbody>
+                          </table>
+                      </div>
+                  {% else %}
+
+                      <div class="text-center">No data currently available</div>
+                  {% endif %}
+              </div>
+            </div>
+            
+        </div>
+
+        <div class="tab-pane" id="reports">
+
+            {#as per my department#}
+            {#only HOD and accountant claimant and accountant examiner should have access to this#}
+            {% if user and
+            (user.response[0]['roleId']==2 or user.response[0]['roleId']==3 or user.response[0]['roleId']==4) %}
+
+            <div id="individual">fdv fv</div>
+
+            {#for all departments {for VC,DVC & SENIOR accountants}#}
+                {% if  user.response[0]['departmentId']==7 or user.response[0]['departmentId']==1%}
+                    <div id="all">
+                        dff
+                    </div>
+
+                {% endif %}
+
+            {% endif %}
+
+
+        </div>
+    </div>
+
+{% endblock %}
+

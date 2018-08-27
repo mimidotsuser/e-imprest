@@ -1,0 +1,67 @@
+{% extends "partials/staff.twig" %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <li class="">Imprest</li>
+    <li class="">Surrender</li>
+
+{% endblock %}
+
+{% block content %}
+
+
+    <div class="card">
+      <div class="card-body">
+
+          {% if all and all.code==200 %}
+
+              <div class="table-responsive">
+                  <table class="table table-bordered">
+                      <thead>
+                      <tr>
+                          <th>Request ID</th>
+                          <th>Amount Assigned</th>
+                          <th>Date Requested</th>
+                          <th>Date Warranted</th>
+                          <th>Action</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+
+                      {% for request in all.response %}
+                          <tr>
+                              <td>{{ request.ImprestId }}</td>
+                              <td>{{ request.amntApproved}}</td>
+                              <td>{{ request.dateRequested  |date('m/d/Y')}}</td>
+                              <td>{{ request.dateProcessed  |date('m/d/Y')}}</td>
+                              <td>
+
+                                  <form action="/staff/imprest/surrender/apply" method="post">
+                                      <input type="hidden" name="requestId" value="{{ request.ImprestId }}">
+                                      <a class="btn btn-sm btn-info"
+                                         href="{{ baseUrl}}/storage/imprest/printouts/{{  request.ImprestId  }}.pdf" target="_blank">
+                                          Imprest Form  <i class="fa fa-download"></i></a>
+                                      <button type="submit" class="btn btn-sm btn-success">Apply Surrender</button>
+                                  </form>
+                              </td>
+                          </tr>
+
+                      {% endfor %}
+
+
+                      </tbody>
+                  </table>
+              </div>
+
+              {% else %}
+
+              <div class="text-center">
+                  <h3>No current pending request</h3>
+              </div>
+          {% endif %}
+
+      </div>
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends "partials/staff.twig" %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <li class="">Finance</li>
+    <li class="active">Chart Of Accounts</li>
+{% endblock %}
+
+{% block content %}
+
+    {#only HOD finance department should have access to this#}
+    {% if user and user.response[0]['departmentId']==7 and  user.response[0]['roleId']==2 %}
+
+
+        <div class="table-responsive">
+            <div class="card">
+                <div class="card-header text-center lead">
+                    <button class="btn btn-sm btn-success float-left" data-toggle="modal" data-target="#coaId">
+                        <i class="fa fa-plus"></i>
+                        Add
+                    </button>
+                    Chart Of Accounts
+                    <a href="/staff/imprest/reports/coa" class="btn btn-info float-right">Print All <i class="fa fa-print"></i></a>
+
+                </div>
+                <div class="card-body">
+
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Account Code</th>
+                            <th>Account Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {% if accnts and accnts.status=='success' and accnts.code==200 %}
+                            {% for accnt in accnts.response %}
+                                <tr>
+                                    <td>{{ accnt.accntCode }}</td>
+                                    <td>{{ accnt.name }}</td>
+                                    <td>{{ accnt.accntTypeId }}</td>
+                                    <td>{{ accnt.description }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="coaId" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title text-uppercase">Add New Account </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="card">
+                            <div class="card-body p-5">
+
+                                <form action="/staff/chartofaccnts" method="post">
+
+                                    <div class="col-md-6">
+
+                                        <div class="form-group">
+                                            <label for="type">Category Type</label>
+                                            <select class="form-control" name="type" id="type" required>
+
+                                                {% if accnttype and accnttype.status=='success' and accnttype.code==200 %}
+                                                    {% for ac in accnttype.response %}
+                                                        <option value="{{ ac.Id }}">{{ ac.name }}</option>
+                                                    {% endfor %}
+                                                {% endif %}
+
+                                            </select>
+                                        </div>
+
+                                        {#<div class="form-group">#}
+                                        {#<label for="details">Details Type</label>#}
+                                        {#<textarea class="form-control" name="details" id="details" rows="3"></textarea>#}
+                                        {#</div>#}
+                                        <div class="form-group">
+                                            <label for="descrip">Description</label>
+                                            <input type="text" class="form-control" name="descrip" id="descrip" required
+                                                   placeholder="">
+                                        </div>
+
+                                        <div class="form-group invisible" id="deptV">
+                                            <label for="dept">Department</label>
+                                            <select class="form-control" name="dept" id="dept">
+                                                {% if depart and depart.code==200 %}
+
+                                                    {% for details in depart.response %}
+                                                        <option value="{{ details.id }}">{{ details.name }}</option>
+
+                                                    {% endfor %}
+                                                {% endif %}
+
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+
+                                        <div class="form-group">
+                                            <label for="name">Name</label>
+                                            <input type="text" class="form-control" name="name" id="name" required
+                                                   placeholder="">
+                                        </div>
+
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="subAc" id="subAc"> Is subaccount
+                                        </label>
+
+                                        <div class="form-group invisible" id="pView">
+                                            <label for="parent">Select Parent</label>
+                                            <select class="form-control" name="parent" id="parent">
+                                                {% if accnts and accnts.status=='success' and accnts.code==200 %}
+                                                    {% for accnt in accnts.response %}
+                                                        <option value="{{ accnt.accntCode }}">{{ accnt.name }}</option>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </select>
+
+                                        </div>
+                                        
+                                    </div>
+
+                                    <div class="float-right">
+                                        <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-success  m-2">Submit</button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+
+        <div class="card">
+            <div class="card-body">
+
+                {% include 'partials/403.twig' %}
+            </div>
+        </div>
+
+    {% endif %}
+{% endblock %}
+
+
+{% block scripts %}
+    {{ parent() }}
+
+    <script>
+        $(function () {
+
+            $('#subAc').change(function () {
+                if ($(this).is(':checked')) {
+                    //if is sub-account, enable user to select the parent account
+                    $('#pView').removeClass('invisible');
+                    $('#parent').attr('required', true);
+                    $('#deptV').removeClass('invisible');
+
+                } else {
+                    $('#deptV').addClass('invisible');
+                    $('#pView').addClass('invisible');
+                    $('#parent').removeAttr('required');
+
+                }
+            })
+
+        })
+    </script>
+{% endblock %}

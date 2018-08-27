@@ -1,0 +1,69 @@
+{% extends "partials/staff.twig" %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+{% endblock %}
+
+
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-body">
+    {% if request and request.code==200 %}
+
+        {% set request=request.response[0] %}
+
+        <form action="/staff/imprest/surrender" class="col-md-8 mx-auto" method="post" enctype="multipart/form-data">
+
+            <input type="hidden" name="imprestId" value="{{ request.ImprestId }}">
+            <input type="hidden" name="amntAssigned" value="{{ request.amntApproved }}">
+
+            <div class="form-group">
+                <label for="id">Imprest No</label>
+                <input type="text" id="id" class="form-control disabled" value="{{ request.ImprestId }}" disabled required>
+            </div>
+
+            <div class="form-group">
+                <label for="amntAss">Amount Assigned</label>
+                <input type="number"
+                       class="form-control disabled" name="amntAss" id="amntAss" value="{{ request.amntApproved }}" disabled required>
+            </div>
+
+
+            <div class="form-group">
+                <label for="refundAmnt">Refund Amount</label>
+                <input type="number"
+                       class="form-control" name="refundAmnt" id="refundAmnt" min="0" value="0" aria-describedby="helpId" placeholder="">
+                <small id="helpId" class="form-text text-muted text-sm-left">Extra amount assigned to be refunded</small>
+            </div>
+            <div class="form-group">
+                <label for="claimingAmnt">Amount Claiming to be refunded</label>
+                <input type="number"
+                       class="form-control" name="claimingAmnt" id="claimingAmnt" min="0" value="0"
+                       max="{{ request.amntApproved*15/100 }}">
+                <small id="helpId" class="form-text text-muted text-sm-left">Maximum refundable amount = {{ request.amntApproved*15/100 }} Ksh only</small>
+
+            </div>
+
+
+            <div class="form-group">
+                <label for="uploads">Upload receipt/invoice/evidence of expense</label>
+                <input type="file" class="form-control-file" name="uploads" id="uploads" accept="application/pdf" required>
+            </div>
+            <div class="float-right">
+                <button type="reset" class="btn btn-sm btn-danger">reset</button>
+                <button type="submit" class="btn btn-sm btn-success">submit</button>
+            </div>
+
+        </form>
+
+        {% else %}
+        <div class="text-center">Request Invalid please try again</div>
+    {% endif %}
+
+
+      </div>
+    </div>
+
+{% endblock %}

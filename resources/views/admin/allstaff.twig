@@ -1,0 +1,234 @@
+{% extends "partials/admin.twig" %}
+
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <li class="">staff</li>
+    <li class="active">view all</li>
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="table-responsive bg-white">
+        <div class="card">
+        <div class="card-header">
+            <a href="/admin/add_staff" class="float-left btn btn sm btn-success">Add <i class="fa fa-plus"></i></a>
+        </div>
+            <div class="card-body">
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>Staff ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if data and data.status=='success' and data.status!=300 %}
+
+                {% for staff in data.response %}
+
+                    <tr>
+                        <td>{{ staff.staffnumber }}</td>
+                        <td>{{ staff.name }}</td>
+                        <td>{{ staff.department }}</td>
+                        <td>{{ staff.role }}</td>
+                    <td>
+                        <div>
+                            <button class="btn btn-sm btn-success btn-edit" id="{{ staff.screenId }}">edit</button>
+                        </div>
+                    </td>
+                    </tr>
+
+                {% endfor %}
+            {% endif %}
+        </table>
+        </div>
+    </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="upd" tabindex="-1" role="dialog" aria-labelledby="update" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="update">Update staff account details</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <form action="/admin/view_all" method="post" class="col-md-12"  >
+
+                        <input type="hidden" name="screenId" id="screenId1">
+                        {#left side#}
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="fname">First name</label>
+                                <input type="text"
+                                       class="form-control" name="fname" id="fname"
+                                       aria-describedby="firstname" placeholder="" required>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="lname">Last name</label>
+                                <input type="text"
+                                       class="form-control" name="lname" id="lname"
+                                       aria-describedby="last name" placeholder="" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="sname">Surname</label>
+                                <input type="text"
+                                       class="form-control" name="sname" id="sname"
+                                       aria-describedby="surname" placeholder="" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="staffno">Staff File Number</label>
+                                <input type="text"
+                                       class="form-control" name="staffno" id="staffno"
+                                       maxlength="5" minlength="5" min="100" value="" required>
+                            </div>
+
+
+                        </div>
+
+
+                        {#right side#}
+                        <div class="col-md-6">
+
+                            <input type="hidden" name="dept" disabled id="bckupPlan">
+
+                            <div class="form-group">
+                                <label for="role">Staff Role</label>
+                                <select class="form-control" name="role" id="role" required>
+
+                                    {% if userrole and userrole.status=='success' and userrole.code=='200' %}
+
+                                        {% for role in userrole.response %}
+                                            <option value="{{ role.id }}">{{ role.name|upper }}</option>
+                                        {% endfor %}
+
+                                    {% endif %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="dept">Department</label>
+                                <select class="form-control" name="dept" id="dept" required>
+                                    {% if depts and depts.status=='success' and depts.code=='200' %}
+                                        {% for department in depts.response %}
+                                            <option value="{{ department.id }}">{{ department.name|upper }}</option>
+                                        {% endfor %}
+
+                                    {% endif %}
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="status">Account Status</label>
+                                <select class="form-control" name="status" id="status">
+                                    <option value="1">Active</option>
+                                    <option value="2">Suspended</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="p-5 float-right">
+
+                            <button type="reset" class="btn btn-info"  data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success ">Submit</button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+    {{ parent() }}
+
+    <script >
+
+        $(function () {
+
+            valStaffNo();
+            $('.btn-edit').click(function () {
+
+                $.post("/admin/staff/data",
+                    {id:$(this).attr('id')},
+                    function (data) {
+                        if((data)!==null) {
+
+                            try {
+                                data=JSON.parse(data).response[0];
+
+                                $('#screenId1').val(data.screenId);
+                                $('#fname').val(data.firstname);
+                                $('#lname').val(data.lastname);
+                                $('#sname').val(data.surname);
+                                $('#staffno').val(data.staffnumber);
+                                $('#status').val(data.active);
+                                $('#dept').val(data.departmentId);
+                                $('#role').val(data.roleId);
+                                //finally launch the modal
+                                $('#upd').modal();
+
+                            } catch (e) {
+
+                            }
+
+                        }
+                        });
+
+            });
+
+            $('#role').change(function () {
+
+                var rex = new RegExp('ACCOUNT', 'i');
+
+                var obj= $('#dept');
+
+                if(rex.test($(this).find(':selected').text())){
+                    obj.val(7).attr('disabled',true);
+
+                    $('#bckupPlan').val(obj.val()).removeAttr('disabled');
+
+                }else {
+                    $('#dept').val(1).removeAttr('disabled');
+                    $('#bckupPlan').attr('disabled',true);
+                }
+            })
+        })
+
+
+        function valStaffNo() {
+            $('#staffno').on('keyup keyenter keypress',function (e) {
+
+                $(this).removeClass('invalid');
+
+                if(isNaN (parseInt(e.key)) ||e.keyCode==69){
+                    $(this).addClass('invalid');
+                    e.preventDefault();
+                }
+            });
+
+        }
+
+
+    </script>
+{% endblock %}
+

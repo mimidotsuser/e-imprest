@@ -1,0 +1,25 @@
+{
+  "name": "mimidots/ezzy",
+  "description": "full mimidots website",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Martin Murage",
+      "email": "hello@mimidots.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.6.4",
+    "vlucas/phpdotenv": "~2.2",
+    "murage/sqlddl":"~1.0.0",
+    "twig/twig": "^2.4",
+    "setasign/fpdf": "^1.8",
+    "africastalking/africastalking": "^2.0"
+  },
+  "autoload": {
+    "classmap":[
+      "./"
+    ]
+  }
+}

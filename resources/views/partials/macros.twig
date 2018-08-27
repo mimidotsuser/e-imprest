@@ -1,0 +1,561 @@
+{% macro accountPassword(url) %}
+
+    <div class="col-md-10 col-sm-12 card p-4 ml-lg-5 mx-auto">
+        <h6 class="p-4 text-center text-uppercase">Change the password</h6>
+
+        <form action="{{ url }}" method="post">
+
+            <div class="form-group">
+                <label for="pass">Current Password</label>
+                <input type="password" class="form-control"
+                       name="oldpass" id="pass" placeholder="Old Password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="pass1">New Password</label>
+                <input type="password" class="form-control"
+                       name="newpass" id="pass1" placeholder="New Password" required>
+            </div>
+            <div class="form-group">
+                <label for="pass2">Confirm Password</label>
+                <input type="password" class="form-control"
+                       name="confirmpass" id="pass2" placeholder="Confirm Password" required>
+            </div>
+
+            <button type="submit" class="btn btn-success float-right">Update password</button>
+        </form>
+    </div>
+{% endmacro %}
+
+{% macro feeback(notification) %}
+
+    {% if notification %}
+
+        {% autoescape false %}
+
+            {% if notification.status=='error' %}
+
+                <div class="alert  bg-flat-color-4 text-white text-center" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Error! </strong>
+                    <p class="text-white">{{ notification.response }}</p>
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-success" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>Success</strong>
+                    <p>{{ notification.response }}</p>
+
+                </div>
+
+            {% endif %}
+        {% endautoescape %}
+
+
+    {% endif %}
+{% endmacro %}
+
+{% macro imprestRequest(data) %}
+    <div class="row">
+
+        <div class="col-md-6">
+            <div class="card border-0">
+                <h5 class="card-header">Application Request Info</h5>
+                <div class="card-body text-muted">
+                    <table class="table table-hover">
+                        <tbody>
+
+                        <tr>
+                            <td>Reference Number</td>
+                            <td>{{ data.ImprestId }}</td>
+                        </tr>
+                        <tr>
+                            <td>Amount Requested</td>
+                            <td>{{ data.amntApproved }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Description</td>
+                            <td>{{ data.description }}</td>
+                        </tr>
+                        <tr>
+                            <td>Itinerary</td>
+                            <td>{{ data.itinerary }}</td>
+                        </tr>
+                        <tr>
+                            <td>Estimated days away</td>
+                            <td>{{ data.est }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Expected date</td>
+                            <td>{{ data.expectedDate }}</td>
+                        </tr>
+                        {% if data.attachmentsAvail %}
+                            <tr>
+                                <td>Recommendation</td>
+                                <td>
+                                    <a target="_blank" href="/storage/imprest/recommendations/{{ data.attachmentsAvail }}"
+                                       class="btn btn-sm btn-info">download</a>
+                                </td>
+                            </tr>
+                        {% endif %}
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0">
+                <h5 class="card-header">Applicant Details</h5>
+                <div class="card-body text-muted">
+                    <table class="table table-hover">
+                        <tbody>
+                        <tr>
+                            <td>Name</td>
+                            <td>{{ data.firstname }}  {{ data.lastname }} {{ data.surname }}</td>
+                        </tr>
+                        <tr>
+                            <td>Staff Number</td>
+                            <td>{{ data.staffnumber }}</td>
+                        </tr>
+                        <tr>
+                            <td>Department</td>
+                            <td>{{ data.department }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Staff Role</td>
+                            <td>{{ data.role }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+            <div class="card border-0 mt-3">
+                <h5 class="card-header">{{ data.department }} Imprest Budget Overview</h5>
+                <div class="card-body text-muted">
+                    <table class="table table-hover">
+                        <tbody>
+
+                        <tr>
+                            <td>Amount allocated</td>
+                            <td>{{ data.budget }}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Expenditure</td>
+                            <td>{{ data.expense-data.amntApproved }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Available Funds</td>
+                            <td>{{ data.budget-(data.expense-data.amntApproved) }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+            <div class="float-right p-3">
+                <button class="btn btn-success" data-toggle="modal" data-target="#processF">Approve</button>
+                <button class="btn btn-danger" data-toggle="modal" data-target="#processR">Reject</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal Approve-->
+    <div class="modal fade" id="processF" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="">Complete Approving Request</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    {% if  data.requestLevel!=5 %}
+
+                        <form action="/staff/imprest/approve?id=request" method="post">
+                            <input type="hidden" name="imprestId" value="{{ data.ImprestId }}">
+                            <input type="hidden" name="status" value="1">
+                            <input type="hidden" name="level" value="{{ data.requestLevel+1 }}">
+                            <input type="hidden" name="dept" value="{{ data.departmentId }}">
+                            <input type="hidden" name="parentDepartment" value="{{ data.parentDepartment }}">
+                            <input type="hidden" name="role" value="{{ data.roleId }}">
+
+                            <div class="form-group">
+                                <label for="amount">Amount Approved</label>
+                                <input type="number"
+                                       class="form-control" name="amount" min="1000"
+                                       max="{{ data.budget-(data.expense-data.amntApproved) }}"
+                                       id="amount" value="{{ data.amntApproved }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="comment">Comments</label>
+                                <textarea class="form-control" name="comment" id="comment" rows="3"
+                                          placeholder="optional"></textarea>
+                            </div>
+
+                            <div class="float-right">
+                                <button type="submit" class="btn btn-primary">I approve</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">close</button>
+                            </div>
+
+                        </form>
+                    {% else %}
+                        {#warranted imprest acknowledgement#}
+                        <form action="/staff/imprest/approve?id=request_acknowledge" method="post">
+                            <input type="hidden" name="imprestId" value="{{ data.ImprestId }}">
+                            <input type="hidden" name="status" value="1">
+                            <input type="hidden" name="level" value="{{ data.requestLevel }}">
+                            <input type="hidden" name="dept" value="{{ data.departmentId }}">
+                            <input type="hidden" name="parentDepartment" value="{{ data.parentDepartment }}">
+                            <input type="hidden" name="role" value="{{ data.roleId }}">
+
+                            <div class="form-group">
+                                <label for="amount">Amount Approved</label>
+                                <input type="number"
+                                       class="form-control" name="amount" min="1000"
+                                       max="{{ data.budget-(data.expense-data.amntApproved) }}"
+                                       id="amount" value="{{ data.amntApproved }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="comment">Comments</label>
+                                <textarea class="form-control" name="comment" id="comment" rows="3"
+                                          placeholder="optional"></textarea>
+                            </div>
+
+                            <div class="float-right">
+                                <button type="submit" class="btn btn-primary">I Acknowledge the warranted Request
+                                </button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">close</button>
+                            </div>
+
+                        </form>
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="processR" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="">Reject Request</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    {% if  data.requestLevel!=5 %}
+
+                        <form action="/staff/imprest/approve?id=request" method="post">
+                            <input type="hidden" name="imprestId" value="{{ data.ImprestId }}">
+                            <input type="hidden" name="status" value="0">
+                            <input type="hidden" name="amount" value="{{ data.amntApproved }}">
+                            <input type="hidden" name="level" value="{{ data.requestLevel+1 }}">
+                            <input type="hidden" name="dept" value="{{ data.departmentId }}">
+                            <input type="hidden" name="parentDepartment" value="{{ data.parentDepartment }}">
+                            <input type="hidden" name="role" value="{{ data.roleId }}">
+
+
+                            <div class="form-group">
+                                <label for="comment">Reason For Rejection</label>
+                                <textarea class="form-control" name="comment" rows="3" required></textarea>
+                            </div>
+
+                            <div class="float-right">
+                                <button type="submit" class="btn btn-primary">submit</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">close</button>
+                            </div>
+
+                        </form>
+                    {% else %}
+
+                        <form action="/staff/imprest/approve?id=request_acknowledge" method="post">
+                            <input type="hidden" name="imprestId" value="{{ data.ImprestId }}">
+                            <input type="hidden" name="status" value="0">
+                            <input type="hidden" name="amount" value="{{ data.amntApproved }}">
+                            <input type="hidden" name="level" value="{{ data.requestLevel }}">
+                            <input type="hidden" name="dept" value="{{ data.departmentId }}">
+                            <input type="hidden" name="parentDepartment" value="{{ data.parentDepartment }}">
+                            <input type="hidden" name="role" value="{{ data.roleId }}">
+
+
+                            <div class="form-group">
+                                <label for="comment">Reason For Rejection</label>
+                                <textarea class="form-control" name="comment" rows="3" required></textarea>
+                            </div>
+
+                            <div class="float-right">
+                                <button type="submit" class="btn btn-primary">I acknowledge</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">close</button>
+                            </div>
+
+                        </form>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro imprestWarrant(data) %}
+
+    <div class="row">
+
+        <div class="col-md-6">
+            <div class="card border-0">
+                <h5 class="card-header">Applicant Details</h5>
+                <div class="card-body text-muted">
+                    {% set applicant=data.extra %}
+                    <table class="table table-hover">
+                        <tbody>
+                        <tr>
+                            <td>Name</td>
+                            <td>{{ applicant.firstname }}  {{ applicant.lastname }} {{ applicant.surname }}</td>
+                        </tr>
+                        <tr>
+                            <td>Staff Number</td>
+                            <td>{{ applicant.staffnumber }}</td>
+                        </tr>
+                        <tr>
+                            <td>Department</td>
+                            <td>{{ applicant.department }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Staff Role</td>
+                            <td>{{ applicant.role }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+            <div class="card border-0 mt-3">
+                <h5 class="card-header">{{ applicant.department }} Budget Overview</h5>
+                <div class="card-body text-muted">
+                    <table class="table table-hover">
+                        <tbody>
+
+                        <tr>
+                            <td>Amount allocated</td>
+                            <td>{{ applicant.budget }}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Expenditure</td>
+                            <td>{{ applicant.expense }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Available Funds</td>
+                            <td>{{ applicant.budget-applicant.expense }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-6">
+            <div class="card">
+                <h5 class="card-header">Application Request Info</h5>
+                <div class="card-body text-muted">
+                    <table class="table table-hover">
+                        <tbody>
+                        <tr>
+                            <td>Imprest Reference No</td>
+                            <td>{{ data.imprestId }}</td>
+                        </tr>
+                        <tr>
+                            <td>Imprest request Form</td>
+                            <td><a href="{{ baseUrl }}/storage/imprest/printouts/{{ data.imprestId }}.pdf"
+                                   target="_blank" class="btn btn-info btn-sm">download</a></td>
+                        </tr>
+                        <tr>
+                            {#<td>Request Summary</td>#}
+                            {#<td>{{ applicant.description }}</td>#}
+                        </tr>
+                        <tr>
+                            <td>Amount Assigned</td>
+                            <td>{{ data.amountAssigned }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Total Claim</td>
+                            <td>{{ data.amountClaiming }}</td>
+                        </tr>
+                        <tr>
+                            <td>Total refunding</td>
+                            <td>{{ data.amountRefunding }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Uploads</td>
+                            <td><a href="{{ baseUrl }}/storage/imprest/receipts/{{ data.attachmentUrl }}"
+                                   target="_blank" class="btn btn-info btn-sm">download</a></td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+            <div class="float-right m-2">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#approve">Approve
+                </button>
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#rejection">Reject
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="approve" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modelTitleId">Complete Surrender Request Approval</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    {% if  data.requestLevel!=5 %}
+
+                    <form action="/staff/surrender/approve/?id=1" method="post">
+                        <input type="hidden" name="refId" value="{{ data.refId }}">
+                        <input type="hidden" name="status" value="1">
+                        <input type="hidden" name="level" value="{{ data.requestLevel+1 }}">
+                        <input type="hidden" name="dept" value="{{  applicant.departmentId}}">
+                        <input type="hidden"  name="parentDepartment" value="{{ applicant.parentDepartment }}">
+                        <input type="hidden" name="role" value="{{ applicant.roleId }}">
+                        <input type="hidden" name="amount" value="{{ data.amountAssigned }}">
+
+                         <div class="form-group">
+                            <label for="comment1">Comments</label>
+                            <textarea class="form-control" name="comment" id="comment1" rows="3" placeholder="optional">
+                            </textarea>
+                        </div>
+                        <div class="float-right">
+                            <button type="submit" class="btn btn-success">I approve</button>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+
+                    {% else %}
+                    {#surrendered imprest acknowledgement#}
+                        <form action="/staff/surrender/approve/?id=2" method="post">
+                            <input type="hidden" name="refId" value="{{ data.refId }}">
+                            <input type="hidden" name="status" value="1">
+                            <input type="hidden" name="departmentId" value="{{  applicant.departmentId}}">
+                            <input type="hidden" name="amount" value="{{ data.amountAssigned }}">
+                            <input type="hidden" name="imprestId" value="{{ data.imprestId }}">
+
+                            <div class="form-group">
+                                <label for="comment1">Comments</label>
+                                <textarea class="form-control" name="comment" id="comment1" rows="3" placeholder="optional">
+                            </textarea>
+                            </div>
+                            <div class="float-right">
+                                <button type="submit" class="btn btn-primary">I Acknowledge the surrender Request</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                            </div>
+                        </form>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="rejection" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modelTitleId">Reject Request</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% if  data.requestLevel!=5 %}
+
+                    <form action="/staff/surrender/approve/?id=1" method="post">
+                        <input type="hidden" name="status" value="2">
+                        <input type="hidden" name="refId" value="{{ data.refId }}">
+                        <input type="hidden" name="level" value="{{ data.requestLevel+1 }}">
+                        <input type="hidden" name="dept" value="{{  applicant.departmentId}}">
+                        <input type="hidden"  name="parentDepartment" value="{{ applicant.parentDepartment }}">
+                        <input type="hidden" name="role" value="{{ applicant.roleId }}">
+                        <input type="hidden" name="amount" value="{{ data.amountAssigned }}">
+
+                        <div class="form-group">
+                            <label for="comment1">Reason for rejection</label>
+                            <textarea class="form-control" name="comment" id="comment1" rows="3" required>
+                            </textarea>
+                        </div>
+                        <div class="float-right">
+                            <button type="submit" class="btn btn-success">Submit</button>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+
+                    {% else %}
+                        {#surrendered imprest acknowledgement#}
+                        <form action="/staff/surrender/approve/?id=2" method="post">
+                            <input type="hidden" name="status" value="2">
+                            <input type="hidden" name="refId" value="{{ data.refId }}">
+
+                            <div class="form-group">
+                                <label for="comment1">Reason for rejection</label>
+                                <textarea class="form-control" name="comment" id="comment1" rows="3" required>
+                            </textarea>
+                            </div>
+                            <div class="float-right">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+

@@ -1,0 +1,71 @@
+{% from 'partials/macros.twig' import  feeback as alert%}
+{% extends "partials/skeleton.twig" %}
+
+{% block holder %}
+
+
+    <div class="container py-3">
+        <div class="row">
+            <div class="col-md-12">
+                {#<h2 class="text-center text-dark text-uppercase  ">Staff Portal</h2>#}
+                <div class="row">
+                    <div class="col-md-8 mx-auto">
+
+                        <div class="text-center pb-2">
+                            <img src="/public/images/logo.png" class="l-logo" alt="kisii_logo"/>
+                        </div>
+
+                        <div class="card rounded-0">
+                            <div class="card-body">
+
+                                {{ alert(notify) }}
+
+                                <form class="form" role="form" action="/login/two-step-verification" method="POST" autocomplete="off">
+
+                                    <input type="text" name="csrf_token" id="csrf" hidden value="{{ csrf }}"
+                                           placeholder="">
+
+                                    <p>To continue, please enter the code we sent to {{ mobile }}</p>
+
+                                    <div class="form-group">
+                                        <label for="vcode">Verification Code</label>
+                                        <input type="text"
+                                               class="form-control" name="vcode" id="vcode" required>
+                                    </div>
+                                    <small id="helpId" class="text-muted text-center p-3">Did not receive the code? Click
+                                        <a href="#" id="resend">here</a> to resend</small>
+
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-success " id="btnLogin">verify
+                                        </button>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+
+    <script>
+        $(function () {
+            $('#resend').click(function () {
+                //make post request
+                $.post('',function () {
+
+                })
+            });
+        })
+    </script>
+{% endblock %}

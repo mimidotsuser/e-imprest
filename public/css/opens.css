@@ -1,0 +1,120 @@
+.content{
+    background-color: #56b69e;
+}
+.timeline{
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.timeline::after{
+    content: '';
+    position: absolute;
+    width: 6px;
+    background-color: white;
+    top: 0;
+    bottom: 0;
+    left:30%;
+    margin-left: -3px;
+}
+
+/*container around content*/
+.wrapper{
+    padding: 10px 40px;
+    position: relative;
+    background-color: inherit;
+    width: 50%;
+}
+
+.wrapper::after{
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    right: -13px;
+    background-color: white;
+    border: 4px solid #FF9F55;
+    top:15px;
+    border-radius:50% ;
+    z-index: 1;
+}
+
+.timeline-content{
+    padding: 20px;
+    background-color: white;
+    position: relative;
+    border-radius: 6px;
+}
+
+.content-left{
+    left: 0;
+}
+.content-right{
+    left: 30%;
+}
+
+
+/*arrows*/
+.content-left::before{
+    content: '';
+    height: 0;
+    position: absolute;
+    top: 22px;
+    width: 0;
+    z-index: 1;
+    right: 30px;
+    border: 10px solid transparent;
+    border-right-width: 0;
+    border-left-color: white;
+}
+
+.content-right::before{
+    content:'';
+    height: 0;
+    position: absolute;
+    top: 22px;
+    width: 0;
+    z-index: 1;
+    left: 30px;
+    border: 10px solid transparent;
+    border-right-color: white;
+    border-left-width: 0;
+}
+
+/*fix right content dot*/
+.content-right::after{
+    left: -14px;
+}
+
+/*responsiveness*/
+@media screen and (max-width: 600px){
+
+    /*timeline to the left*/
+    .timeline::after{
+        left: 31px;
+    }
+    /*let the content take 100% width*/
+
+    .wrapper{
+        width: 100%;
+        padding-left: 70px;
+        padding-right: 25px;
+    }
+
+    /*arrows point left*/
+    .wrapper::before{
+        left: 60px;
+        border: 10px solid transparent;
+        border-right-color: white;
+        border-left-width: 0;
+    }
+
+    /*ensures the dots are at same spot*/
+    .content-left::after, .content-right::after{
+        left: 15px;
+    }
+
+    .content-right{
+        left: 0%;
+    }
+}

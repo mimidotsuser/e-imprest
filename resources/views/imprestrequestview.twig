@@ -1,0 +1,35 @@
+{% import 'partials/macros.twig' as fun %}
+{% extends "partials/staff.twig" %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <li class="">Imprest</li>
+    <li class="active">Application</li>
+    <li class="active">View</li>
+{% endblock %}
+
+
+{% block content %}
+
+    {% if user and
+    (user.response[0]['roleId']==2 or user.response[0]['roleId']==3 or user.response[0]['roleId']==4) %}
+
+        {% if request and request.code==200 %}
+
+            {{ fun.imprestRequest(request.response[0]) }}
+        {% else %}
+            Request Incomplete. Please try again later
+        {% endif %}
+
+
+    {% else %}
+
+        <div class="card">
+            <div class="card-body">
+
+                {% include 'partials/403.twig' %}
+            </div>
+        </div>
+
+    {% endif %}
+{% endblock %}

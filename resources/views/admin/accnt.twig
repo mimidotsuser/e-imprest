@@ -1,0 +1,17 @@
+{% from 'partials/macros.twig' import accountPassword as accnt%}
+
+{% extends "partials/admin.twig" %}
+
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <li class="">account</li>
+    <li class="active">password</li>
+{% endblock %}
+
+
+{% block content %}
+
+    {{ accnt() }}
+
+{% endblock %}

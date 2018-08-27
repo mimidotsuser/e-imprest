@@ -1,0 +1,118 @@
+{% extends "partials/staff.twig" %}
+
+{% block styles %}
+    {{ parent() }}
+    <link rel="stylesheet" href="/public/css/opens.css">
+{% endblock %}
+
+
+{% block breadcrumb %}
+{{ parent() }}
+
+    <li class="">Imprest</li>
+    <li class="">Reports</li>
+    <li class="">Timeline view</li>
+{% endblock %}
+
+
+{% block content %}
+
+
+    {% if  data and data.code==200 %}
+
+        <div class="timeline mt-5">
+
+            {% if data.type==1 %} {#imprest request progress#}
+                {% set levels=['',"HOD","Accounts Claimaint (Votebook Section)","Accountant (Examiner Section)",'VC/DVC (A,P&F)/REGISTRAR (ADMIN.) ',"F.O./DFO/SENIOR ACCOUNTANT"] %}
+            {% for req in data.response %}
+
+                {% if req.requestLevel==1 and req.status==0 %}
+                    <div class="wrapper content-right">
+                        <div class="timeline-content ">
+                            <h5 class="text-center pb-3">Initial request</h5>
+                            <p><strong>Request Reference: </strong> {{ req.ImprestId }}</p>
+                            <p><strong>Amount Requested: </strong> {{ req.initAmount }}</p>
+                            <p><strong>Date: </strong> {{ req.dateRequested }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                        <div class="wrapper content-right">
+                            <div class="timeline-content">
+                                <h6 class="p-2 text-center">{{ levels[loop.index0] }}</h6>
+
+
+                                <p><strong>Status :</strong> {{ req.status==1 or req.status==4?'Approved':'Rejected' }}</p>
+                                <p><strong>Amount :</strong> {{ req.amntApproved }}</p>
+                                <p><strong>Date: </strong> {{ req.dateProcessed }}</p>
+                                <p><strong>Comments: </strong> {{ req.comments }}</p>
+                                {% if req.requestLevel==5 and req.status==4 %}
+                                   <p><strong class="">Application Form :
+                                           <a  href="{{ baseUrl}}/storage/imprest/printouts/{{  req.ImprestId  }}.pdf" target="_blank" class="btn btn-sm btn-info ml-4">Download</a>
+                                       </strong></p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                {% endif %}
+
+
+                
+
+            {% endfor %}
+
+            {% endif %}
+
+            {% if data.type==2 %} {#imprest surrender progress#}
+                {% set levels=['',"HOD","Accountant (Examiner Section)",
+                'DVC (A,P&F)/REGISTRAR (ADMIN.) ',"Accounts Claimaint (Votebook Section)",
+                "F.O./DFO/SENIOR ACCOUNTANT"] %}
+                {% for req in data.response %}
+
+                    {% if req.requestLevel==1 and req.status==0 %}
+                        <div class="wrapper content-right">
+                            <div class="timeline-content ">
+                                <h5 class="text-center mb-4">Initial request</h5>
+                                <p><strong>Imprest Reference: </strong>   {{ req.imprestId }}</p>
+                                <p><strong>Claim: </strong> {{ req.initAmount }}</p>
+                                <p><strong>Refund: </strong> {{ req.initAmount }}</p>
+                                <p><strong>Date: </strong> {{ req.dateRequested }}</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="wrapper content-right">
+                            <div class="timeline-content">
+                                <h6 class="p-2 text-center">{{ levels[loop.index0] }}</h6>
+
+
+                                <p><strong>Status :</strong> {{ req.status==1 or req.status==4?'Approved':'Rejected' }}</p>
+                                <p><strong>Amount :</strong> {{ req.amntApproved }}</p>
+                                <p><strong>Date: </strong> {{ req.dateProcessed }}</p>
+                                <p><strong>Comments: </strong> {{ req.comments }}</p>
+                                {% if req.requestLevel==5 and req.status==4 %}
+                                    <p><strong class="">Application Form :
+                                            <a  href="{{ baseUrl}}/storage/imprest/printouts/{{  req.refId  }}.pdf" class="btn btn-sm btn-info ml-4">Download</a>
+                                        </strong></p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    {% endif %}
+
+
+
+
+                {% endfor %}
+
+            {% endif %}
+
+
+
+        </div>
+
+    {% else %}
+
+        <div class="text-center m-5">
+            Invalid request. Please try again
+        </div>
+    {% endif %}
+{% endblock %}
